@@ -1,0 +1,70 @@
+{% include 'myapp/navbar.html' %}
+
+  <title>Register</title>
+
+ 
+<body>
+
+<section class="vh-100 bg-image">
+  <div class="mask d-flex align-items-center h-100 gradient-custom-3">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-12 col-md-9 col-lg-7 col-xl-6">
+          <div class="card">
+            <div class="card-body p-5">
+              <h2 class="text-uppercase text-center mb-5">Create an account</h2>
+
+              {% if messages %}
+              <div class="alert alert-danger">
+                {% for message in messages %}
+                <p>{{ message }}</p>
+                {% endfor %}
+              </div>
+              {% endif %}
+
+              <form method="post" action="{% url 'myapp:register' %}">
+                {% csrf_token %}
+
+                <div class="form-outline mb-4">
+                  <label class="form-label" for="id_first_name">First Name</label>
+                  <input type="text" id="id_first_name" class="form-control form-control-lg" name="first_name" />
+                </div>
+
+                <div class="form-outline mb-4">
+                  <label class="form-label" for="id_last_name">Last Name</label>
+                  <input type="text" id="id_last_name" class="form-control form-control-lg" name="last_name" />
+                </div>
+
+                <div class="form-outline mb-4">
+                  <label class="form-label" for="id_username">Username</label>
+                  <input type="text" id="id_username" class="form-control form-control-lg" name="username" />
+                </div>
+
+                <div class="form-outline mb-4">
+                  <label class="form-label" for="id_mobile_number">Mobile Number</label>
+                  <input type="text" id="id_mobile_number" class="form-control form-control-lg" name="mobile_number" />
+                </div>
+
+                <div class="form-outline mb-4">
+                  <label class="form-label" for="id_password">Password</label>
+                  <input type="password" id="id_password" class="form-control form-control-lg" name="password" />
+                </div>
+
+                <div class="d-grid gap-2">
+                  <button type="submit" value="register" class="btn btn-success btn-lg gradient-custom-4 text-body">Register</button>
+                </div>
+
+                <p class="text-center text-muted mt-5 mb-0">Already have an account? <a href="{% url 'myapp:login' %}" class="fw-bold text-body"><u>Login here</u></a></p>
+
+              </form>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

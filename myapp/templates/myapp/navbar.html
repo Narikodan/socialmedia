@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Vigu</title>
+  {% load static %}
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Agdasima:wght@400&display=swap">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Agdasima', sans-serif;
+      padding-top: 70px; /* Add padding to create space below the navbar */
+      background-color: skyblue; /* Set the body background color to sky blue */
+    }
+
+    .navbar-brand {
+      margin: auto;
+      font-style: italic;
+      color: #ff0000; /* Red color */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: inherit; /* Inherit the body background color */
+    }
+
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background-color: inherit; /* Inherit the body background color */
+    }
+
+    .navbar-nav {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background-color: lightblue; /* Set the background color of the pop-up to light blue */
+      padding: 10px;
+      border-radius: 30px; /* Set the border radius for the pop-up */
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      z-index: 9999; /* Increase the z-index value */
+      margin-top: 0; /* Remove the margin-top */
+      column-count: 2; /* Divide the items into two columns */
+    }
+
+    .navbar .nav-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 5px;
+      color: #000000; /* Set the color of the text */
+    }
+
+    .navbar .nav-link i {
+      margin-right: 5px;
+    }
+
+    .navbar .nav-link:hover {
+      background-color: #e9ecef;
+    }
+
+    .navbar:hover .navbar-nav {
+      display: block;
+    }
+
+    .logo-image {
+      width: 200px; /* Set the desired width */
+      height: auto; /* Automatically adjust the height while maintaining the aspect ratio */
+      border-radius: 50%; /* Make the image rounded */
+      opacity: 0.7; /* Set the transparency level (0.0 to 1.0) */
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: inherit;">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">
+      <img src="{% static 'vigu.png' %}" alt="Logo" class="logo-image">
+    </a>
+    {% if user.is_authenticated and not user.is_superuser %}
+    <div class="navbar-nav position-absolute top-100 start-50 translate-middle" style="z-index: 9999;">
+      <a class="nav-link" href="#"><i class="fas fa-home"></i> Home</a>
+      <a class="nav-link" href="#"><i class="fas fa-user"></i> Profile</a>
+      <a class="nav-link" href="#"><i class="fas fa-comments"></i> Messages</a>
+      <a class="nav-link" href="#"><i class="fas fa-bell"></i> Notifications</a>
+      <a class="nav-link" href="#"><i class="fas fa-users"></i> Friends</a>
+      <a class="nav-link" href="{% url 'myapp:logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+    {% endif %}
+  </div>
+</nav>
+
+<!-- Your content here -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
