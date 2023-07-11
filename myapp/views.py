@@ -4,12 +4,22 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from .models import Post
+from django.conf import settings
+import os
 
 def index(request):
     if request.user.is_authenticated:
+        posts = Post.objects.all()  # Retrieve all posts from the database
         success_message = messages.get_messages(request)
-        return render(request, 'myapp/index.html', {'success_message': success_message})
-    return render(request, 'myapp/login.html')
+
+        context = {
+            'posts': posts,
+            'success_message': success_message
+        }
+
+        return render(request, 'myapp/index.html', context)
+    return redirect('myapp:login')
 
 def register(request):
     User = get_user_model()
@@ -52,3 +62,28 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('myapp:index')
+
+
+
+@login_required
+def create_post(request):
+    if request.method == 'POST':
+        text = request.POST.get('text')
+        image = request.FILES.get('image')
+        user = request.user
+        post = Post(user=user, text=text, image=image)
+        post.save()
+
+        # Move the uploaded image file to the desired directory
+        if image:
+            new_file_path = os.path.join('post_images', image.name)
+            new_file_path = os.path.join(settings.MEDIA_ROOT, new_file_path)
+            os.makedirs(os.path.dirname(new_file_path), exist_ok=True)
+            with open(new_file_path, 'wb') as new_file:
+                for chunk in image.chunks():
+                    new_file.write(chunk)
+
+        return redirect('myapp:index')  # Redirect to the home page after successful post creation
+
+    return render(request, 'myapp/post.html')
+
