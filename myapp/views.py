@@ -125,3 +125,13 @@ def upload_profile_picture(request):
         profile_picture = ProfilePicture.objects.create(user=request.user, image=image)
         return redirect('myapp:profile')
     return render(request, 'myapp/upload_profile_picture.html')
+
+@login_required
+def delete_post(request):
+    if request.method == 'POST':
+        post_id = request.POST.get('post_id')
+        post = get_object_or_404(Post, id=post_id, user=request.user)
+        post.delete()
+        return JsonResponse({'success': True})
+    else:
+        return JsonResponse({'success': False})
