@@ -87,7 +87,7 @@
     </a>
     {% if user.is_authenticated and not user.is_superuser %}
     <div class="navbar-nav position-absolute top-100 start-50 translate-middle" style="z-index: 9999;">
-      <a class="nav-link" href="#"><i class="fas fa-home"></i> Home</a>
+      <a href="{% url 'myapp:index' %}"  class="nav-link" href="#"><i class="fas fa-home"></i> Home</a>
       <a class="nav-link" href="#"><i class="fas fa-user"></i> Profile</a>
       <a class="nav-link" href="#"><i class="fas fa-comments"></i> Messages</a>
       <a class="nav-link" href="#"><i class="fas fa-bell"></i> Notifications</a>
