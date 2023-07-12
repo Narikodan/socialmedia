@@ -126,8 +126,12 @@
       <img src="{{ post.image.url }}" alt="Post Image" class="card-image">
       {% endif %}
       <div class="card-buttons">
-        <button>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="black" class="bi bi-heart" viewBox="0 0 16 16">
+        <button class="like-button" data-post-id="{{ post.id }}" onclick="likePost(event, {{ post.id }})">
+          {% if request.user in post.likes.all %}
+            <svg id="likebtn" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="red" class="bi bi-heart" viewBox="0 0 16 16">
+          {% else %}
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="black" class="bi bi-heart" viewBox="0 0 16 16">
+          {% endif %}
             <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
           </svg> 
         </button>
@@ -147,7 +151,67 @@
 </div>
 
 <!-- Your content here -->
+...
+<script>
+  function likePost(event, postId) {
+    event.preventDefault();
+    var likeButton = event.target;
+  
+    console.log('likeButton:', likeButton);
+  
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '{% url "myapp:like_post" %}', true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
+  
+    xhr.onload = function() {
+      if (xhr.status === 200) {
+        console.log(xhr.responseText);
+  
+        try {
+          var response = JSON.parse(xhr.responseText);
+          if (response.success) {
+            // Use parentNode to access the button element
+            var buttonElement = likeButton.parentNode;
+            if (response.action === 'liked') {
+              buttonElement.querySelector('svg').setAttribute('fill', 'red');
+            } else if (response.action === 'unliked') {
+              buttonElement.querySelector('svg').setAttribute('fill', 'black');
+            }
+          }
+        } catch (error) {
+          console.error('Error parsing JSON response:', error);
+        }
+      } else {
+        console.error('Request failed with status:', xhr.status);
+      }
+    };
+  
+    xhr.onerror = function() {
+      console.error('Request failed.');
+    };
+  
+    xhr.send('post_id=' + encodeURIComponent(postId));
+  }
+  
 
+  // Function to get the CSRF cookie value
+  function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      var cookies = document.cookie.split(';');
+      for (var i = 0; i < cookies.length; i++) {
+        var cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+</script>
 </body>
 </html>
+
 {% endblock %}

@@ -8,9 +8,33 @@ from .models import Post
 from django.conf import settings
 import os
 
+import json
+from django.http import JsonResponse
+
+from django.http import JsonResponse
+
+@login_required
+def like_post(request):
+    if request.method == 'POST':
+        post_id = request.POST.get('post_id')
+        post = get_object_or_404(Post, id=post_id)
+
+        if request.user in post.likes.all():
+            post.likes.remove(request.user)
+            action = 'unliked'
+        else:
+            post.likes.add(request.user)
+            action = 'liked'
+
+        response_data = {'success': True, 'action': action}
+        return JsonResponse(response_data)
+
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+@login_required
 def index(request):
     if request.user.is_authenticated:
-        posts = Post.objects.all()  # Retrieve all posts from the database
+        posts = Post.objects.all()
         success_message = messages.get_messages(request)
 
         context = {
@@ -19,7 +43,10 @@ def index(request):
         }
 
         return render(request, 'myapp/index.html', context)
+
     return redirect('myapp:login')
+
+
 
 def register(request):
     User = get_user_model()
