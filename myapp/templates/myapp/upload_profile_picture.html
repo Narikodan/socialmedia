@@ -1,0 +1,28 @@
+{% extends 'myapp/navbar.html' %}
+
+{% block content %}
+<style>
+    .profile-head {
+        transform: translateY(5rem)
+    }
+</style>
+
+<div class="row py-5 px-4">
+  <div class="col-md-5 mx-auto">
+    <!-- Profile Picture Upload Form -->
+    <div class="bg-white shadow rounded overflow-hidden">
+      <div class="px-4 pt-4 pb-4">
+        <h4 class="mb-4">Upload Profile Picture</h4>
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="image">Choose an image:</label>
+            <input type="file" class="form-control-file" id="image" name="image" accept="image/*" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Upload</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

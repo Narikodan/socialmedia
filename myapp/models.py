@@ -8,6 +8,9 @@ class User(AbstractUser):
     mobile_number = models.CharField(max_length=10)
     password = models.CharField(max_length=20)
 
+class ProfilePicture(models.Model):
+    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, related_name='profile_picture')
+    image = models.ImageField(upload_to='profile_pictures')
 
 class Post(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='posts')
@@ -17,7 +20,7 @@ class Post(models.Model):
 
     def __str__(self):
         return f"Post by {self.user.username}"
-    
+
 class Like(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)

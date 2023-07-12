@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from .models import Post
+from .models import Post, ProfilePicture
 from django.conf import settings
 import os
 
@@ -90,6 +90,11 @@ def logout_view(request):
     logout(request)
     return redirect('myapp:index')
 
+@login_required
+def profile(request):
+    user = request.user
+    return render(request, 'myapp/profile.html', {'user': user})
+
 
 
 @login_required
@@ -114,3 +119,9 @@ def create_post(request):
 
     return render(request, 'myapp/post.html')
 
+def upload_profile_picture(request):
+    if request.method == 'POST':
+        image = request.FILES['image']
+        profile_picture = ProfilePicture.objects.create(user=request.user, image=image)
+        return redirect('myapp:profile')
+    return render(request, 'myapp/upload_profile_picture.html')

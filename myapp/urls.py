@@ -11,4 +11,6 @@ urlpatterns = [
     path('logout', views.logout_view, name='logout'),
     path('create_post', views.create_post, name='create_post'),
     path('like-post/', views.like_post, name='like_post'),
+    path('profile/', views.profile, name='profile'),
+    path('upload_profile_picture/', views.upload_profile_picture, name='upload_profile_picture'),
 ]
