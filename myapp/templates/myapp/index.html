@@ -1,259 +1,124 @@
 {% extends 'myapp/navbar.html' %}
 
 {% block content %}
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>User Dashboard</title>
-  <style>
-    .container-full-width {
-      width: 100%;
-      border-radius: 20px;
+
+<style>
+    body {
+        background-color: #eee
     }
 
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
+    .time {
+        font-size: 9px !important
     }
 
-    .card {
-      margin-bottom: 20px;
-      background-color: #ffffff;
-      border-radius: 20px;
-      padding: 20px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-      display: flex;
-      flex-direction: column;
-      position: relative; /* Add this line */
+    .socials i {
+        margin-right: 14px;
+        font-size: 17px;
+        color: #d2c8c8;
+        cursor: pointer
     }
 
-    .card-profile {
-      display: flex;
-      align-items: center;
-      margin-bottom: 10px;
+    .feed-image img {
+        width: 100%;
+        height: auto
     }
+    .like-button {
+        border: none;
+        background-color: white;
+    }
+</style>
 
-    .card-profile img {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      margin-right: 10px;
-    }
-
-    .card-title {
-      font-size: 16px;
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-
-    .card-content {
-      margin-bottom: 10px;
-    }
-
-    .card-image {
-      max-width: 100%;
-      border-radius: 10px;
-      margin-bottom: 10px;
-    }
-
-    .card-buttons {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .card-buttons button {
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 24px;
-    }
-
-    .card-buttons button i {
-      margin-right: 5px;
-    }
-
-    .card-image {
-      width: 100%;
-      max-height: 300px; /* Adjust the desired maximum height for the image */
-      object-fit: contain; /* Scale the image to fit within the card while maintaining its aspect ratio */
-      border-radius: 10px;
-      margin-bottom: 10px;
-    }
-    .create-post-button {
-      font-size: 30px;
-      color: #000000;
-      cursor: pointer;
-      background-color: inherit;
-      border: none; /* Remove the button border */
-      padding: 0;
-      position: sticky;
-      top: 20px; /* Adjust the top value as per your needs */
-      z-index: 1; /* Set a higher z-index to ensure it appears above other elements */
-      margin-left: 45%;
-      
-    }
-
-    /* Add this CSS for the delete icon */
-    .delete-icon {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      font-size: 24px;
-      color: red;
-      cursor: pointer;
-    }
-  </style>
-
-</head>
-<body>
-  <!-- Delete Confirmation Modal -->
-<div id="deleteConfirmationModal" class="modal" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Delete Confirmation</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p>Are you sure you want to delete this post?</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary cancel-button" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-danger confirm-button">Delete</button>
-      </div>
+<div class="container mt-4 mb-5">
+    <div class="d-flex justify-content-center row">
+        <div class="col-md-8">
+            <div class="feed p-2">
+                <div class="d-flex flex-row justify-content-between align-items-center p-2 bg-white border">
+                    <div class="feed-text px-2">
+                        <a href="{% url 'myapp:create_post' %}">
+                            <h6 class="text-black-50 mt-2">What's on your mind ,{{ request.user.first_name }} ...?</h6>
+                        </a>
+                       
+                    </div>
+                    <div class="feed-icon px-2"><i class="fa fa-long-arrow-up text-black-50"></i></div>
+                </div>
+                {% for post in posts reversed %}
+                <div class="bg-white border mt-2">
+                    <div>
+                        <div class="d-flex flex-row justify-content-between align-items-center p-2 border-bottom">
+                            <div class="d-flex flex-row align-items-center feed-text px-2"><img class="rounded-circle" src="{{ post.user.profile_picture.image.url }}" width="45">
+                                <div class="d-flex flex-column flex-wrap ml-2"><span class="font-weight-bold">{{ post.user.first_name }} {{ post.user.last_name }}</span><span class="text-black-50 time">40 minutes ago</span></div>
+                            </div>
+                            <div class="feed-icon px-2"><i class="fa fa-ellipsis-v text-black-50"></i></div>
+                        </div>
+                    </div>
+                    <div class="p-2 px-3">
+                        <span>{{ post.text }}</span>
+                        {% if post.image %}
+                            <div class="feed-image">
+                                <img src="{{ post.image.url }}" alt="Post Image">
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-flex justify-content-end socials p-2 py-3"> 
+                        <button class="like-button" data-post-id="{{ post.id }}" onclick="likePost(event, {{ post.id }})">
+                        {% if request.user in post.likes.all %}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-heart" viewBox="0 0 16 16">
+                            <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+                          </svg>
+                        {% else %}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+                            <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+                          </svg>
+                        {% endif %}
+                      </button>
+                      <button class="comment-button like-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-square-dots" viewBox="0 0 16 16">
+                            <path d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-2.5a2 2 0 0 0-1.6.8L8 14.333 6.1 11.8a2 2 0 0 0-1.6-.8H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2.5a1 1 0 0 1 .8.4l1.9 2.533a1 1 0 0 0 1.6 0l1.9-2.533a1 1 0 0 1 .8-.4H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+                            <path d="M5 6a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                          </svg>
+                      </button>
+                      <button class="share-button like-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-share" viewBox="0 0 16 16">
+                            <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/>
+                          </svg>
+                      </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
-
-<div class="container-full-width">
-
-  <a href="{% url 'myapp:create_post' %}">
-    <button class="create-post-button">
-      <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="grey" class="bi bi-plus-circle" viewBox="0 0 16 16">
-        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-      </svg>
-    </button>
-  </a>
- 
-
-  <div class="container">
-    {% for post in posts reversed %}
-    <div class="card" id="post-{{ post.id }}">
-      {% if request.user == post.user %}
-      <div class="delete-icon" onclick="deletePost({{ post.id }})">
-        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="grey" class="bi bi-trash3" viewBox="0 0 16 16">
-          <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z"/>
-        </svg>
-      </div>
-      {% endif %}
-      <div class="card-profile">
-        <img src="{{ post.user.profile_picture.image.url }}" alt="Profile Picture" class="rounded-circle profile-picture">
-        <h3 class="card-title">{{ post.user.first_name }} {{ post.user.last_name }}</h3>
-      </div>
-      <div class="card-content">
-        <p>{{ post.text }}</p>
-      </div>
-      {% if post.image %}
-      <img src="{{ post.image.url }}" alt="Post Image" class="card-image">
-      {% endif %}
-      <div class="card-buttons">
-        <button class="like-button" data-post-id="{{ post.id }}" onclick="likePost(event, {{ post.id }})">
-          {% if request.user in post.likes.all %}
-            <svg id="likebtn" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="red" class="bi bi-heart" viewBox="0 0 16 16">
-          {% else %}
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="black" class="bi bi-heart" viewBox="0 0 16 16">
-          {% endif %}
-            <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
-          </svg> 
-        </button>
-        <button>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-chat-dots" viewBox="0 0 16 16">
-            <path d="M5 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
-            <path d="m2.165 15.803.02-.004c1.83-.363 2.948-.842 3.468-1.105A9.06 9.06 0 0 0 8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6a10.437 10.437 0 0 1-.524 2.318l-.003.011a10.722 10.722 0 0 1-.244.637c-.079.186.074.394.273.362a21.673 21.673 0 0 0 .693-.125zm.8-3.108a1 1 0 0 0-.287-.801C1.618 10.83 1 9.468 1 8c0-3.192 3.004-6 7-6s7 2.808 7 6c0 3.193-3.004 6-7 6a8.06 8.06 0 0 1-2.088-.272 1 1 0 0 0-.711.074c-.387.196-1.24.57-2.634.893a10.97 10.97 0 0 0 .398-2z"/>
-          </svg> 
-        </button>
-        <button>
-          <i class="fas fa-share"></i> 
-        </button>
-      </div>
-    </div>
-    {% endfor %}
-  </div>
-</div>
-
-<!-- Your content here -->
-...
 <script>
-  function likePost(event, postId) {
-    event.preventDefault();
-    var likeButton = event.target;
-  
-    console.log('likeButton:', likeButton);
-  
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', '{% url "myapp:like_post" %}', true);
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
-  
-    xhr.onload = function() {
-      if (xhr.status === 200) {
-        console.log(xhr.responseText);
-  
-        try {
-          var response = JSON.parse(xhr.responseText);
-          if (response.success) {
-            // Use parentNode to access the button element
-            var buttonElement = likeButton.parentNode;
-            if (response.action === 'liked') {
-              buttonElement.querySelector('svg').setAttribute('fill', 'red');
-            } else if (response.action === 'unliked') {
-              buttonElement.querySelector('svg').setAttribute('fill', 'black');
-            }
-          }
-        } catch (error) {
-          console.error('Error parsing JSON response:', error);
-        }
-      } else {
-        console.error('Request failed with status:', xhr.status);
-      }
-    };
-  
-    xhr.onerror = function() {
-      console.error('Request failed.');
-    };
-  
-    xhr.send('post_id=' + encodeURIComponent(postId));
-  }
-  
-  function deletePost(postId) {
-    var deleteConfirmationModal = document.getElementById('deleteConfirmationModal');
-    
-    var confirmButton = deleteConfirmationModal.querySelector('.confirm-button');
-    confirmButton.onclick = function() {
-      // Send an AJAX request to delete the post
+    function likePost(event, postId) {
+      event.preventDefault();
+      var likeButton = event.target;
+
+      console.log('likeButton:', likeButton);
+
       var xhr = new XMLHttpRequest();
-      xhr.open('POST', '{% url "myapp:delete_post" %}', true);
+      xhr.open('POST', '{% url "myapp:like_post" %}', true);
       xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
       xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
-  
+
       xhr.onload = function() {
         if (xhr.status === 200) {
           console.log(xhr.responseText);
-  
+
           try {
             var response = JSON.parse(xhr.responseText);
             if (response.success) {
-              // Remove the deleted post from the DOM
-              var deletedPost = document.getElementById('post-' + postId);
-              if (deletedPost) {
-                deletedPost.remove();
+              var buttonElement = likeButton.parentNode;
+              if (response.action === 'liked') {
+                buttonElement.querySelector('svg').classList.remove('bi-heart');
+                buttonElement.querySelector('svg').classList.add('bi-heart-fill');
+                buttonElement.querySelector('svg').style.fill = 'red';
+              } else if (response.action === 'unliked') {
+                buttonElement.querySelector('svg').classList.remove('bi-heart-fill');
+                buttonElement.querySelector('svg').classList.add('bi-heart');
+                buttonElement.querySelector('svg').style.fill = 'currentColor';
               }
             }
           } catch (error) {
@@ -263,44 +128,78 @@
           console.error('Request failed with status:', xhr.status);
         }
       };
-  
+
       xhr.onerror = function() {
         console.error('Request failed.');
       };
-  
+
       xhr.send('post_id=' + encodeURIComponent(postId));
-  
-      deleteConfirmationModal.style.display = 'none';
-    };
-    
-    var cancelButtons = deleteConfirmationModal.querySelectorAll('.cancel-button');
-    for (var i = 0; i < cancelButtons.length; i++) {
-      cancelButtons[i].onclick = function() {
+    }
+
+    function deletePost(postId) {
+      var deleteConfirmationModal = document.getElementById('deleteConfirmationModal');
+
+      var confirmButton = deleteConfirmationModal.querySelector('.confirm-button');
+      confirmButton.onclick = function() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '{% url "myapp:delete_post" %}', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
+
+        xhr.onload = function() {
+          if (xhr.status === 200) {
+            console.log(xhr.responseText);
+
+            try {
+              var response = JSON.parse(xhr.responseText);
+              if (response.success) {
+                var deletedPost = document.getElementById('post-' + postId);
+                if (deletedPost) {
+                  deletedPost.remove();
+                }
+              }
+            } catch (error) {
+              console.error('Error parsing JSON response:', error);
+            }
+          } else {
+            console.error('Request failed with status:', xhr.status);
+          }
+        };
+
+        xhr.onerror = function() {
+          console.error('Request failed.');
+        };
+
+        xhr.send('post_id=' + encodeURIComponent(postId));
+
         deleteConfirmationModal.style.display = 'none';
       };
-    }
-    
-    deleteConfirmationModal.style.display = 'block';
-  }
-  
 
-  // Function to get the CSRF cookie value
-  function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-      var cookies = document.cookie.split(';');
-      for (var i = 0; i < cookies.length; i++) {
-        var cookie = cookies[i].trim();
-        if (cookie.substring(0, name.length + 1) === (name + '=')) {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-          break;
+      var cancelButtons = deleteConfirmationModal.querySelectorAll('.cancel-button');
+      for (var i = 0; i < cancelButtons.length; i++) {
+        cancelButtons[i].onclick = function() {
+          deleteConfirmationModal.style.display = 'none';
+        };
+      }
+
+      deleteConfirmationModal.style.display = 'block';
+    }
+
+    function getCookie(name) {
+      var cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+          var cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
         }
       }
+      return cookieValue;
     }
-    return cookieValue;
-  }
-</script>
-</body>
-</html>
+  </script>
+
 
 {% endblock %}

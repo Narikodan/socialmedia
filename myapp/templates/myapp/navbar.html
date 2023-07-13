@@ -15,87 +15,130 @@
       font-size: 30px;
     }
 
-    .navbar-brand {
-      margin: auto;
-      font-style: italic;
-      color: #ff0000; /* Red color */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background-color: inherit; /* Inherit the body background color */
+    nav {
+      margin: 27px auto 0;
+      position: relative;
+      width: 590px;
+      height: 50px;
+      background-color: #34495e;
+      border-radius: 8px;
+      font-size: 0;
     }
 
-    .navbar {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background-color: inherit; /* Inherit the body background color */
+    nav a {
+      line-height: 50px;
+      height: 100%;
+      font-size: 15px;
+      display: inline-block;
+      position: relative;
+      z-index: 1;
+      text-decoration: none;
+      text-transform: uppercase;
+      text-align: center;
+      color: white;
+      cursor: pointer;
     }
 
-    .navbar-nav {
-      display: none;
+    nav .animation {
       position: absolute;
-      top: 100%;
+      height: 100%;
+      top: 0;
+      z-index: 0;
+      transition: all .5s ease 0s;
+      border-radius: 8px;
+    }
+
+    a:nth-child(1) {
+      width: 100px;
+    }
+
+    a:nth-child(2) {
+      width: 110px;
+    }
+
+    a:nth-child(3) {
+      width: 100px;
+    }
+
+    a:nth-child(4) {
+      width: 160px;
+    }
+
+    a:nth-child(5) {
+      width: 120px;
+    }
+
+    nav .start-home, a:nth-child(1):hover~.animation {
+      width: 100px;
       left: 0;
-      right: 0;
-      background-color: lightblue; /* Set the background color of the pop-up to light blue */
-      padding: 10px;
-      border-radius: 30px; /* Set the border radius for the pop-up */
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-      z-index: 9999; /* Increase the z-index value */
-      column-count: 2; /* Divide the items into two columns */
+      background-color: #1abc9c;
     }
 
-    .navbar .nav-link {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 5px;
-      color: #000000; /* Set the color of the text */
+    nav .start-about, a:nth-child(2):hover~.animation {
+      width: 110px;
+      left: 100px;
+      background-color: #e74c3c;
     }
 
-    .navbar .nav-link i {
-      margin-right: 5px;
+    nav .start-blog, a:nth-child(3):hover~.animation {
+      width: 100px;
+      left: 210px;
+      background-color: #3498db;
     }
 
-    .navbar .nav-link:hover {
-      background-color: #e9ecef;
+    nav .start-portefolio, a:nth-child(4):hover~.animation {
+      width: 160px;
+      left: 310px;
+      background-color: #9b59b6;
     }
 
-    .navbar:hover .navbar-nav {
-      display: block;
+    nav .start-contact, a:nth-child(5):hover~.animation {
+      width: 120px;
+      left: 470px;
+      background-color: #e67e22;
     }
 
-    .logo-image {
-      width: 200px; /* Set the desired width */
-      height: auto; /* Automatically adjust the height while maintaining the aspect ratio */
-      border-radius: 50%; /* Make the image rounded */
-      opacity: 0.7; /* Set the transparency level (0.0 to 1.0) */
+    body {
+      font-size: 12px;
+      font-family: sans-serif;
+      background: #2c3e50;
     }
 
-    .content-container {
-      padding-top: 70px; /* Add padding to create space below the navbar */
+    h1 {
+      text-align: center;
+      margin: 40px 0 40px;
+      text-align: center;
+      font-size: 30px;
+      color: #ecf0f1;
+      text-shadow: 2px 2px 4px #000000;
+      font-family: 'Cherry Swash', cursive;
+    }
+
+    p {
+      position: absolute;
+      bottom: 20px;
+      width: 100%;
+      text-align: center;
+      color: #ecf0f1;
+      font-family: 'Cherry Swash',cursive;
+      font-size: 16px;
+    }
+
+    span {
+      color: #2BD6B4;
     }
   </style>
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: inherit;">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="#">
-      <img src="{% static 'vigu.png' %}" alt="Logo" class="logo-image">
-    </a>
-    {% if user.is_authenticated and not user.is_superuser %}
-    <div class="navbar-nav position-absolute top-100 start-50 translate-middle" style="z-index: 9999;">
-      <a href="{% url 'myapp:index' %}"  class="nav-link" href="#"><i class="fas fa-home"></i> Home</a>
-      <a href="{% url 'myapp:profile' %}" class="nav-link" href="#"><i class="fas fa-user"></i> Profile</a>
-      <a class="nav-link" href="#"><i class="fas fa-comments"></i> Messages</a>
-      <a class="nav-link" href="#"><i class="fas fa-bell"></i> Notifications</a>
-      <a class="nav-link" href="#"><i class="fas fa-users"></i> Friends</a>
-      <a class="nav-link" href="{% url 'myapp:logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
-    </div>
-    {% endif %}
-  </div>
+<nav>
+  <a href="{% url 'myapp:index' %}">Home</a>
+  <a href="{% url 'myapp:profile' %}">Profile</a>
+  <a href="#">Messages</a>
+  <a href="#">Notifications</a>
+  <a href="{% url 'myapp:logout' %}">Logout</a>
+  
+  <div class="animation start-home"></div>
 </nav>
 
 <div class="content-container">
