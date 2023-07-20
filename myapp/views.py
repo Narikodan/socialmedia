@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from .models import Post, ProfilePicture
+from .models import Comment, Post, ProfilePicture
 from django.conf import settings
 import os
 
@@ -37,9 +37,13 @@ def index(request):
         posts = Post.objects.all()
         success_message = messages.get_messages(request)
 
+        # Calculate comment count for each post
+        comment_counts = {post.id: Comment.get_comment_count_for_post(post.id) for post in posts}
+
         context = {
             'posts': posts,
-            'success_message': success_message
+            'success_message': success_message,
+            'comment_counts': comment_counts,  # Add comment_counts to the context
         }
 
         return render(request, 'myapp/index.html', context)
@@ -95,6 +99,11 @@ def profile(request):
     user = request.user
     return render(request, 'myapp/profile.html', {'user': user})
 
+@login_required
+def other_profile(request,username=None):
+    user = get_object_or_404(get_user_model(), username=username)
+    return render(request, 'myapp/other_profile.html', {'user': user})
+
 
 
 @login_required
@@ -135,3 +144,76 @@ def delete_post(request):
         return JsonResponse({'success': True})
     else:
         return JsonResponse({'success': False})
+    
+@login_required
+def notification_view(request):
+    user = request.user
+    posts = Post.objects.filter(user=user)
+    
+    notifications = []
+    for post in posts:
+        notification = {
+            'title': post.get_like_notification(),
+            'post': post
+        }
+        if notification['title']:
+            notifications.append(notification)
+    
+    context = {
+        'notifications': notifications
+    }
+
+    return render(request, 'myapp/notifications.html', context)
+
+@login_required
+def post_detail(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    # Additional logic for displaying the post details
+    # You can customize this view according to your requirements
+    context = {
+        'post': post
+    }
+    return render(request, 'myapp/post_detail.html', context)
+
+
+@login_required
+def comments(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    comments = Comment.objects.filter(post=post)
+    context = {
+        'post': post,
+        'comments': comments,
+    }
+    return render(request, 'myapp/comments.html', context)
+
+
+@login_required
+def add_comment(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+
+    if request.method == 'POST':
+        text = request.POST.get('text')
+        user = request.user
+
+        # Create a new comment object and save it to the database
+        comment = Comment(user=user, post=post, text=text)
+        comment.save()
+
+        # Redirect back to the post detail page after adding the comment
+        return redirect('myapp:comments', post_id=post_id)
+
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+@login_required
+def delete_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+
+    if request.method == 'POST' and comment.user == request.user:
+        # Delete the comment from the database
+        comment.delete()
+
+        # Redirect back to the post detail page after deleting the comment
+        return redirect('myapp:post_detail', post_id=comment.post.id)
+
+    return JsonResponse({'success': False, 'error': 'Invalid request method or permission'})
+

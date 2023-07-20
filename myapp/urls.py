@@ -14,4 +14,10 @@ urlpatterns = [
     path('profile/', views.profile, name='profile'),
     path('upload_profile_picture/', views.upload_profile_picture, name='upload_profile_picture'),
     path('delete_post/', views.delete_post, name='delete_post'),
+    path('notifications/', views.notification_view, name='notifications'),
+    path('post_detail/<int:post_id>/', views.post_detail, name='post_detail'),
+    path('other_profile/<str:username>/', views.other_profile, name='other_profile'),
+    path('comments/<int:post_id>/', views.comments, name='comments'),
+    path('add_comment/<int:post_id>/', views.add_comment, name='add_comment'),
+    
 ]

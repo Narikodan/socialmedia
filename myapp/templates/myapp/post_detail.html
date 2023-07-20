@@ -4,7 +4,7 @@
 
 <style>
     body {
-      background: #f1f2f3;
+        background-color: #eee
         
     }
 
@@ -33,34 +33,9 @@
     }
     .feed-text .font-weight-bold {
         color: rgb(88, 87, 87) !important; /* Set the text color to black */
-        margin-left: 20px;
     }
-    .time {
-      margin-left: 20px;
-    }
-    /* Custom CSS */
-.badge-secondary {
-  background-color: #9debb0; /* Change this to your preferred background color */
-  color: #000; /* Set the text color to black */
-}
-
     
 </style>
-
-<div class="text-black-50 container mt-4 mb-5">
-    <div class="d-flex justify-content-center row">
-        <div class="col-md-8">
-            <div class="feed p-2">
-                <div class="d-flex flex-row justify-content-between align-items-center p-2 bg-white border">
-                    <div class="feed-text px-2">
-                        <a href="{% url 'myapp:create_post' %}">
-                            <h6 class="text-black-50 mt-2">What's on your mind ,{{ request.user.first_name }} ...?</h6>
-                        </a>
-                       
-                    </div>
-                    <div class="feed-icon px-2"><i class="fa fa-long-arrow-up text-black-50"></i></div>
-                </div>
-
 
                 <div id="deleteConfirmationModal" class="modal" tabindex="-1" role="dialog">
                   <div class="modal-dialog modal-dialog-centered" role="document">
@@ -84,18 +59,11 @@
                 
 
 
-
-                {% for post in posts reversed %}
-
                 <div class="bg-white border mt-2">
                     <div>
                         <div class="d-flex flex-row justify-content-between align-items-center p-2 border-bottom">
-                            <div class="d-flex flex-row align-items-center feed-text px-2">
-                              <a href="{% url 'myapp:other_profile' post.user.username %}" style="text-decoration: none;">
-                                <img class="rounded-circle" src="{{ post.user.profile_picture.image.url }}" width="45">
-                              </a>
-                                <div class="d-flex flex-column flex-wrap ml-2">
-                                  <span class="font-weight-bold">{{ post.user.first_name }} {{ post.user.last_name }}</span><span class="text-black-50 time">{{ post.created_at|timesince }}</span></div>
+                            <div class="d-flex flex-row align-items-center feed-text px-2"><img class="rounded-circle" src="{{ post.user.profile_picture.image.url }}" width="45">
+                                <div class="d-flex flex-column flex-wrap ml-2"><span class="font-weight-bold">{{ post.user.first_name }} {{ post.user.last_name }}</span><span class="text-black-50 time">{{ post.created_at|timesince }}</span></div>
                             </div>
                             {% if request.user == post.user %}
       <div class="delete-icon" onclick="deletePost({{ post.id }})">
@@ -134,16 +102,11 @@
                                 </svg>
                         {% endif %}
                       </button>
-                      <button class="comment-button like-button" onclick="window.location.href='{% url 'myapp:comments' post.id %}'">
+                      <button class="comment-button like-button">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-square-dots" viewBox="0 0 16 16">
                             <path d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-2.5a2 2 0 0 0-1.6.8L8 14.333 6.1 11.8a2 2 0 0 0-1.6-.8H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2.5a1 1 0 0 1 .8.4l1.9 2.533a1 1 0 0 0 1.6 0l1.9-2.533a1 1 0 0 1 .8-.4H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
                             <path d="M5 6a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
                           </svg>
-                          {% with comment_count=post.get_comment_count %}
-            {% if comment_count > 0 %}
-                Comments <span class="badge badge-secondary" id="commentCount{{ post.id }}">{{ comment_count }}</span>
-            {% endif %}
-        {% endwith %}
                       </button>
                       <button class="share-button like-button">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-share" viewBox="0 0 16 16">
@@ -152,7 +115,7 @@
                       </button>
                     </div>
                 </div>
-                {% endfor %}
+          
             </div>
         </div>
     </div>
