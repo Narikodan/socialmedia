@@ -131,7 +131,18 @@ def create_post(request):
 def upload_profile_picture(request):
     if request.method == 'POST':
         image = request.FILES['image']
-        profile_picture = ProfilePicture.objects.create(user=request.user, image=image)
+
+        # Check if the user already has a profile picture
+        existing_profile_picture = ProfilePicture.objects.filter(user=request.user).first()
+
+        if existing_profile_picture:
+            # If the user already has a profile picture, update it
+            existing_profile_picture.image = image
+            existing_profile_picture.save()
+        else:
+            # If the user doesn't have a profile picture, create a new one
+            profile_picture = ProfilePicture.objects.create(user=request.user, image=image)
+        
         return redirect('myapp:profile')
     return render(request, 'myapp/upload_profile_picture.html')
 
