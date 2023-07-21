@@ -74,7 +74,7 @@
     nav .start-home, a:nth-child(1):hover~.animation {
       width: 20%;
       left: 0;
-      background-color: #1abc9c;
+      
     }
 
     nav .start-about, a:nth-child(2):hover~.animation {
@@ -130,19 +130,23 @@
     span {
       color: #0a0a0a;
     }
+    nav a.active {
+      color: rgb(121, 245, 228); /* Change the text color to red for the selected icon */
+    }
   </style>
 </head>
 <body>
 
-<nav>
-  <a href="{% url 'myapp:index' %}"><i class="fas fa-home"></i></a>
-  <a href="{% url 'myapp:profile' %}"><i class="fas fa-user"></i></a>
-  <a href="#"><i class="fas fa-envelope"></i></a>
-  <a href="{% url 'myapp:notifications' %}"><i class="fas fa-bell"></i></a>
-  <a href="{% url 'myapp:logout' %}"><i class="fas fa-sign-out-alt"></i></a>
+  <nav>
+    <a href="{% url 'myapp:index' %}" class="{% if request.resolver_match.view_name == 'myapp:index' %}active{% endif %}"><i class="fas fa-home"></i></a>
+    <a href="{% url 'myapp:profile' %}" class="{% if request.resolver_match.view_name == 'myapp:profile' %}active{% endif %}"><i class="fas fa-user"></i></a>
+    <a href="{% url 'myapp:chat_select_user' %}" class="{% if request.resolver_match.view_name == 'myapp:chat_select_user' %}active{% endif %}"><i class="fas fa-envelope"></i></a>
+    <a href="{% url 'myapp:notifications' %}" class="{% if request.resolver_match.view_name == 'myapp:notifications' %}active{% endif %}"><i class="fas fa-bell"></i></a>
+    <a href="{% url 'myapp:logout' %}" class="{% if request.resolver_match.view_name == 'myapp:logout' %}active{% endif %}"><i class="fas fa-sign-out-alt"></i></a>
+    
+    <div class="animation start-home"></div>
+  </nav>
   
-  <div class="animation start-home"></div>
-</nav>
 
 <div class="content-container">
  

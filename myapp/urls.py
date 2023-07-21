@@ -19,5 +19,8 @@ urlpatterns = [
     path('other_profile/<str:username>/', views.other_profile, name='other_profile'),
     path('comments/<int:post_id>/', views.comments, name='comments'),
     path('add_comment/<int:post_id>/', views.add_comment, name='add_comment'),
+    path('chat-rooms/', views.chat_rooms, name='chat_rooms'),
+    path('chat-select-user/', views.chat_select_user, name='chat_select_user'),
+    path('<str:slug>/', views.chat_room, name='room'),
     
 ]

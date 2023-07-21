@@ -63,3 +63,13 @@ class Comment(models.Model):
     @classmethod
     def get_comment_count_for_post(cls, post_id):
         return cls.objects.filter(post_id=post_id).count()
+    
+
+from chatapp.models import Room
+
+class ChatParticipant(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='chats')
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.user.username} in {self.room.name}"

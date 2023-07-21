@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from django.urls import reverse
 from .models import Comment, Post, ProfilePicture
 from django.conf import settings
 import os
@@ -227,4 +228,63 @@ def delete_comment(request, comment_id):
         return redirect('myapp:post_detail', post_id=comment.post.id)
 
     return JsonResponse({'success': False, 'error': 'Invalid request method or permission'})
+
+
+from django.shortcuts import render
+from chatapp.models import Room
+
+@login_required
+def chat_rooms(request):
+    rooms = Room.objects.all()
+    return render(request, "myapp/chat_rooms.html", {"rooms": rooms})
+
+def chat_room(request, slug):
+    room = Room.objects.get(slug=slug)
+    return render(request, 'myapp/chat_room.html', {'room': room})
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
+from chatapp.models import Room, ChatParticipant
+
+from django.urls import reverse
+from django.db.models import Q  # Import Q to perform complex queries
+
+@login_required
+def chat_select_user(request):
+    # Get the list of available users for chat (exclude the logged-in user and users already in a chat room)
+    available_users = get_user_model().objects.exclude(id=request.user.id).exclude(
+        chats__room__in=ChatParticipant.objects.filter(user=request.user).values('room')
+    )
+
+    if request.method == 'POST':
+        selected_user_id = request.POST.get('user_id')
+        if selected_user_id:
+            selected_user = get_user_model().objects.get(id=selected_user_id)
+
+            # Check if a room already exists with both the logged-in user and the selected user
+            existing_room = Room.objects.filter(
+                Q(chat_participants__user=request.user) & Q(chat_participants__user=selected_user)
+            ).first()
+
+            if existing_room:
+                # If a room already exists, redirect to that room
+                room_url = reverse('chatapp:room', kwargs={'slug': existing_room.slug})
+                return redirect(room_url)
+            else:
+                # If no room exists, create a new room and add the participants
+                room_name = f"{request.user.username}_{selected_user.username}"
+                room, created = Room.objects.get_or_create(name=room_name)
+                if created:
+                    ChatParticipant.objects.create(user=request.user, room=room)
+                    ChatParticipant.objects.create(user=selected_user, room=room)
+
+                # Redirect to the new chat room
+                room_url = reverse('chatapp:room', kwargs={'slug': room.slug})
+                return redirect(room_url)
+
+    return render(request, 'myapp/chat_select_user.html', {'available_users': available_users})
+
+
+
 
