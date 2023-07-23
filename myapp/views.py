@@ -252,7 +252,6 @@ from django.db.models import Q  # Import Q to perform complex queries
 
 @login_required
 def chat_select_user(request):
-    # Get the list of available users for chat (exclude the logged-in user and users already in a chat room)
     available_users = get_user_model().objects.exclude(id=request.user.id).exclude(
         chats__room__in=ChatParticipant.objects.filter(user=request.user).values('room')
     )
@@ -261,6 +260,10 @@ def chat_select_user(request):
         selected_user_id = request.POST.get('user_id')
         if selected_user_id:
             selected_user = get_user_model().objects.get(id=selected_user_id)
+
+            # Sort usernames alphabetically to ensure consistent room name
+            usernames = sorted([request.user.username, selected_user.username])
+            room_name = "_".join(usernames)
 
             # Check if a room already exists with both the logged-in user and the selected user
             existing_room = Room.objects.filter(
@@ -273,7 +276,6 @@ def chat_select_user(request):
                 return redirect(room_url)
             else:
                 # If no room exists, create a new room and add the participants
-                room_name = f"{request.user.username}_{selected_user.username}"
                 room, created = Room.objects.get_or_create(name=room_name)
                 if created:
                     ChatParticipant.objects.create(user=request.user, room=room)
@@ -284,6 +286,7 @@ def chat_select_user(request):
                 return redirect(room_url)
 
     return render(request, 'myapp/chat_select_user.html', {'available_users': available_users})
+
 
 
 
