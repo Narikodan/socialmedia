@@ -1,94 +1,144 @@
+
+
 {% extends 'myapp/navbar.html' %}
 
 {% block content %}
 <style>
-    .profile-head {
-        transform: translateY(5rem);
-    }
-    .profile-card {
-        text-align: center;
-    }
-    .profile-card h4 {
-        font-size: 54px;
-        font-weight: bold;
-        margin-bottom: 0; /* Remove the bottom margin for the user's name */
-    }
-    .profile-card .profile {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.5rem; /* Adjust the spacing between the user's name and profile picture */
-    }
-    .profile-card .profile img {
-        width: 130px;
-        height: 130px;
-        border-radius: 50%; /* Make the profile picture rounded */
-        object-fit: cover;
-    }
-</style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500&display=swap');
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+.main{
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: url(images/back.jpg);
+  background-position: center;
+  background-size: cover;
+}
+.profile-card{
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 400px;
+  width: 100%;
+  border-radius: 25px;
+  padding: 30px;
+  border: 1px solid #ffffff40;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+}
+.image{
+  position: relative;
+  height: 150px;
+  width: 150px;
+}
+.image .profile-pic{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+}
+.data{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 15px;
+}
+.data h2{
+  font-size: 33px;
+  font-weight: 600;
+  
+}
+span{
+  font-size: 18px;
+  color: #a4dbc5;
+}
+.row{
+  display: flex;
+  align-items: center;
+  margin-top: 30px;
+}
+.row .info{
+  text-align: center;
+  padding: 0 20px;
+}
+.buttons{
+  display: flex;
+  align-items: center;
+  margin-top: 30px;
+}
+.buttons .btn{
+  color: #fff;
+  text-decoration: none;
+  margin: 0 20px;
+  padding: 8px 25px;
+  border-radius: 25px;
+  font-size: 18px;
+  white-space: nowrap;
+  background: linear-gradient(to left, #33ccff 0%, #ff99cc 100%);
+}
+.buttons .btn:hover{
+  box-shadow: inset 0 5px 20px rgba(0,0,0,0.4);
+}
 
+ </style>
 
-<div class="row py-5 px-4">
-  <div class="col-md-5 mx-auto">
-    <!-- Profile widget -->
-    <div class="bg-white shadow rounded overflow-hidden profile-card">
-      <div class="px-4 pt-0 pb-4 cover">
-        
-        <div class="media align-items-end profile-head">
-            <div class="media-body mb-5">
-                <h4 class="mt-0 mb-0"><strong style="text-transform: capitalize;">{{ user.first_name }} {{ user.last_name }}</strong></h4>
-                {% if request.user != user %}
-      <a href="#" class="btn btn-outline-primary">Add friend</a>
-    {% endif %}
-              </div>
-            <div class="profile mr-3">
-                {% if user.profile_picture %}
-                  <img
-                    src="{{ user.profile_picture.image.url }}"
-                    alt="Profile Picture"
-                    width="130"
-                    class="rounded mb-2 img-thumbnail"
-                  />
-                {% else %}
-                  <p>No profile picture</p>
-                {% endif %}
-                {% if user.is_authenticated and request.user == user %}
-                <a href="{% url 'myapp:upload_profile_picture' %}" class="btn btn-outline-dark btn-sm btn-block"
-              >change profile photo</a
-            >
-            {% endif %}
-          </div>
-         
-        </div>
-      </div>
-      
-      
-      <div class="py-4 px-4">
-        <div class="d-flex align-items-center justify-content-between mb-3"> 
-          
-          <a href="#" class="btn btn-link text-muted"></a>
-        </div>
-        <div class="row">
-            <h5 class="mb-0">Recent photos</h5>
-            {% for post in user.posts.all %}
-              {% if post.image %}
-                <div class="col-lg-6 mb-2 pr-lg-1">
-                  <img
-                    src="{{ post.image.url }}"
-                    alt="Post Image"
-                    class="img-fluid rounded shadow-sm"
-                  />
-                </div>
-              {% else %}
-                <div >
-                  <p></p>
-                </div>
-              {% endif %}
-            {% endfor %}
-          </div>
-          
-      </div>
+<section class="main">
+  <div class="profile-card">
+    <div class="image">
+      {% if user.profile_picture %}
+        <img src="{{ user.profile_picture.image.url }}" alt="Profile Picture" class="profile-pic">
+      {% else %}
+        <h3>No Profile picture</h3>>
+      {% endif %}
     </div>
+    <div class="data">
+      <h2>{{ user.first_name }} {{ user.last_name }}</h2>
+      <!-- <span>Developer & Designer</span> -->
+    </div>
+    <!-- <div class="row">
+      <div class="info">
+        <h3>Following</h3>
+        <span>120</span>
+      </div>
+      <div class="info">
+        <h3>Followers</h3>
+        <span>5000</span>
+      </div>
+      <div class="info">
+        <h3>Posts</h3>
+        <span>209</span>
+      </div>
+    </div> -->
+    <div class="buttons">
+      {% if not is_friend_of_viewer %}
+          {% if not has_pending_friend_request %}
+              <form action="{% url 'myapp:send_friend_request' user.id %}" method="post">
+                  {% csrf_token %}
+                  <button type="submit" class="btn">Add Friend</button>
+              </form>
+          {% else %}
+              <form action="{% url 'myapp:cancel_friend_request' user.id %}" method="post">
+                  {% csrf_token %}
+                  <button type="submit" class="btn">Cancel Friend Request</button>
+              </form>
+          {% endif %}
+      {% else %}
+          <form action="{% url 'myapp:unfriend_user' user.id %}" method="post">
+              {% csrf_token %}
+              <button type="submit" class="btn">Unfriend</button>
+          </form>
+      {% endif %}
+      <!-- <a href="#" class="btn">Message</a> -->
   </div>
-</div>
+  
+  </div>
+</section>
 {% endblock %}

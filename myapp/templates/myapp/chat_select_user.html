@@ -6,20 +6,20 @@
     <form method="post" class="mt-3">
         {% csrf_token %}
         <ul class="list-group">
-            {% for user in available_users %}
-            {% if not user.is_superuser %}
+            {% for friend in user.friends.all %}
+            {% if not friend.is_superuser %}
             <li class="list-group-item" style="background-color: #2c3e50; color: white; padding: 5px;">
                 <label class="form-check-label">
-                    <input type="radio" name="user_id" value="{{ user.id }}" class="form-check-input">
+                    <input type="radio" name="user_id" value="{{ friend.id }}" class="form-check-input">
                     <div class="d-flex align-items-center">
-                        {% if user.profile_photo %}
-                        <img src="{{ user.profile_photo.url }}" alt="{{ user.get_full_name }}" class="rounded-circle mr-3" width="40" height="40">
+                        {% if friend.profile_photo %}
+                        <img src="{{ friend.profile_photo.url }}" alt="{{ friend.get_full_name }}" class="rounded-circle mr-3" width="40" height="40">
                         {% else %}
                         <div class="rounded-circle mr-3" style="width: 40px; height: 40px; background-color: #f0f0f0; display: flex; justify-content: center; align-items: center;">
                             <i class="fas fa-user"></i>
                         </div>
                         {% endif %}
-                        <span style="color: white; padding: 5px; font-size: 18px;">{{ user.get_full_name }}</span>
+                        <span style="color: white; padding: 5px; font-size: 18px;">{{ friend.get_full_name }}</span>
                     </div>
                 </label>
             </li>

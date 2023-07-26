@@ -1,3 +1,6 @@
+
+
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -12,7 +15,7 @@
   <style>
     body {
       font-family: 'Agdasima', sans-serif;
-      background-color: skyblue; /* Set the body background color to sky blue */
+      background-color: skyblue;
       font-size: 30px;
     }
 
@@ -39,7 +42,7 @@
       text-align: center;
       color: white;
       cursor: pointer;
-      padding: 0 10px; /* Add padding to create spacing */
+      padding: 0 10px;
     }
 
     nav .animation {
@@ -51,54 +54,44 @@
       border-radius: 8px;
     }
 
-    a:nth-child(1) {
-      width: 20%;
-    }
-
-    a:nth-child(2) {
-      width: 20%;
-    }
-
-    a:nth-child(3) {
-      width: 20%;
-    }
-
-    a:nth-child(4) {
-      width: 20%;
-    }
-
-    a:nth-child(5) {
-      width: 20%;
+    /* Divide the width equally among 6 items */
+    a {
+      width: 16.6667%;
     }
 
     nav .start-home, a:nth-child(1):hover~.animation {
-      width: 20%;
+      width: 16.6667%;
       left: 0;
-      
     }
 
     nav .start-about, a:nth-child(2):hover~.animation {
-      width: 20%;
-      left: 20%;
+      width: 16.6667%;
+      left: 16.6667%;
       background-color: #e74c3c;
     }
 
     nav .start-blog, a:nth-child(3):hover~.animation {
-      width: 20%;
-      left: 40%;
+      width: 16.6667%;
+      left: 33.3333%;
       background-color: #3498db;
     }
 
     nav .start-portefolio, a:nth-child(4):hover~.animation {
-      width: 20%;
-      left: 60%;
+      width: 16.6667%;
+      left: 50%;
       background-color: #9b59b6;
     }
 
     nav .start-contact, a:nth-child(5):hover~.animation {
-      width: 20%;
-      left: 80%;
+      width: 16.6667%;
+      left: 66.6667%;
       background-color: #e67e22;
+    }
+
+    nav .start-friends, a:nth-child(6):hover~.animation {
+      width: 16.6667%;
+      left: 83.3333%;
+      background-color: #27ae60;
     }
 
     body {
@@ -130,30 +123,32 @@
     span {
       color: #0a0a0a;
     }
+
     nav a.active {
-      color: rgb(121, 245, 228); /* Change the text color to red for the selected icon */
+      color: rgb(36, 224, 209);
     }
   </style>
 </head>
 <body>
-
   <nav>
     <a href="{% url 'myapp:index' %}" class="{% if request.resolver_match.view_name == 'myapp:index' %}active{% endif %}"><i class="fas fa-home"></i></a>
     <a href="{% url 'myapp:profile' %}" class="{% if request.resolver_match.view_name == 'myapp:profile' %}active{% endif %}"><i class="fas fa-user"></i></a>
+    <a href="{% url 'myapp:friend_requests' %}" class="{% if request.resolver_match.view_name == 'myapp:friend_requests' %}active{% endif %}"><i class="fas fa-user-friends"></i></a>
     <a href="{% url 'myapp:chat_select_user' %}" class="{% if request.resolver_match.view_name == 'myapp:chat_select_user' %}active{% endif %}"><i class="fas fa-envelope"></i></a>
     <a href="{% url 'myapp:notifications' %}" class="{% if request.resolver_match.view_name == 'myapp:notifications' %}active{% endif %}"><i class="fas fa-bell"></i></a>
     <a href="{% url 'myapp:logout' %}" class="{% if request.resolver_match.view_name == 'myapp:logout' %}active{% endif %}"><i class="fas fa-sign-out-alt"></i></a>
     
+    
     <div class="animation start-home"></div>
   </nav>
-  
 
-<div class="content-container">
- 
-</div>
-{% block content %}
-<!-- Content from other templates will be inserted here -->
-{% endblock %}
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <div class="content-container">
+  </div>
+
+  {% block content %}
+    <!-- Content from other templates will be inserted here -->
+  {% endblock %}
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

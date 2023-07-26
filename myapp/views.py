@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model
+User = get_user_model()
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.urls import reverse
-from .models import Comment, Post, ProfilePicture
+from .models import Comment, FriendRequest, Post, ProfilePicture
 from django.conf import settings
 import os
 
@@ -13,6 +14,13 @@ import json
 from django.http import JsonResponse
 
 from django.http import JsonResponse
+
+def logout_required(view_func):
+    def _wrapped_view(request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect(reverse('myapp:index'))
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view
 
 @login_required
 def like_post(request):
@@ -52,7 +60,7 @@ def index(request):
     return redirect('myapp:login')
 
 
-
+@logout_required
 def register(request):
     User = get_user_model()
     if request.method == 'POST':
@@ -79,6 +87,7 @@ def register(request):
 
     return render(request, 'myapp/register.html')
 
+@logout_required
 def login_view(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -97,13 +106,30 @@ def logout_view(request):
 
 @login_required
 def profile(request):
+    print("entering profile.......")
     user = request.user
     return render(request, 'myapp/profile.html', {'user': user})
 
 @login_required
-def other_profile(request,username=None):
-    user = get_object_or_404(get_user_model(), username=username)
-    return render(request, 'myapp/other_profile.html', {'user': user})
+def other_profile(request, username):
+    user = get_object_or_404(User, username=username)
+
+    # Check if the viewed profile user is a friend of the currently logged-in user
+    is_friend_of_viewer = user.friends.filter(id=request.user.id).exists()
+
+    # Check if there is a pending friend request from the currently logged-in user to the viewed profile user
+    has_pending_friend_request = FriendRequest.objects.filter(from_user=request.user, to_user=user, status='P').exists()
+
+    
+
+    context = {
+        'user': user,
+        'is_friend_of_viewer': is_friend_of_viewer,
+        'has_pending_friend_request': has_pending_friend_request,
+    }
+    return render(request, 'myapp/other_profile.html', context)
+
+
 
 
 
@@ -288,6 +314,99 @@ def chat_select_user(request):
     return render(request, 'myapp/chat_select_user.html', {'available_users': available_users})
 
 
+@login_required
+def send_friend_request(request, user_id):
+    to_user = get_object_or_404(User, id=user_id)
+    if request.method == 'POST':
+        if not request.user.friends.filter(id=user_id).exists() and not request.user.sent_friend_requests.filter(to_user=to_user).exists():
+            FriendRequest.objects.create(from_user=request.user, to_user=to_user)
+            return redirect('myapp:other_profile', username=to_user.username)
+        elif request.user.sent_friend_requests.filter(to_user=to_user).exists():
+            FriendRequest.objects.filter(from_user=request.user, to_user=to_user).delete()
+            return redirect('myapp:other_profile', username=to_user.username)
+    return redirect('myapp:other_profile', username=to_user.username)
+
+@login_required
+def cancel_friend_request(request, user_id):
+    if request.method == 'POST':
+        to_user = get_object_or_404(get_user_model(), id=user_id)
+
+        # Find the friend request from the current user to the to_user and delete it
+        friend_request = FriendRequest.objects.filter(from_user=request.user, to_user=to_user).first()
+        if friend_request:
+            friend_request.delete()
+            messages.success(request, 'Friend request canceled.')
+            # You can implement sending notifications here if desired
+
+    return redirect('myapp:profile')
+
+
+@login_required
+def accept_friend_request(request, request_id):
+    if request.method == 'POST':
+        friend_request = get_object_or_404(FriendRequest, id=request_id, to_user=request.user)
+
+        # Add the sender to the current user's friends and vice versa
+        request.user.friends.add(friend_request.from_user)
+        friend_request.from_user.friends.add(request.user)
+
+        # Delete the friend request after accepting
+        friend_request.delete()
+
+        messages.success(request, 'Friend request accepted!')
+        # You can implement sending notifications here if desired
+
+    return redirect('myapp:friend_requests')
+
+@login_required
+def reject_friend_request(request, request_id):
+    if request.method == 'POST':
+        friend_request = get_object_or_404(FriendRequest, id=request_id, to_user=request.user)
+
+        # Delete the friend request
+        friend_request.delete()
+
+        messages.success(request, 'Friend request rejected.')
+        # You can implement sending notifications here if desired
+
+    return redirect('myapp:friend_requests')
+
+@login_required
+def view_friend_requests(request):
+    friend_requests = FriendRequest.objects.filter(to_user=request.user, status='P')
+
+    # Calculate total number of friends for the logged-in user
+    total_friends = request.user.friends.count()
+
+    # Calculate count of friend requests for the logged-in user
+    friend_requests_count = friend_requests.count()
+
+    context = {
+        'friend_requests': friend_requests,
+        'total_friends': total_friends,
+        'friend_requests_count': friend_requests_count,
+    }
+    return render(request, 'myapp/friend_requests.html', context)
 
 
 
+from django.db.models import Q
+
+@login_required
+def unfriend_user(request, user_id):
+    if request.method == 'POST':
+        to_user = get_object_or_404(User, id=user_id)
+
+        # Check if the users are friends before unfriending
+        if request.user.friends.filter(id=user_id).exists() and to_user.friends.filter(id=request.user.id).exists():
+            # Remove the friend connection
+            request.user.friends.remove(to_user)
+            to_user.friends.remove(request.user)
+
+            # Delete existing friend requests (both sent and received) between the users
+            FriendRequest.objects.filter(Q(from_user=request.user, to_user=to_user) | Q(from_user=to_user, to_user=request.user)).delete()
+
+            messages.success(request, 'You have unfriended the user.')
+            # You can implement sending notifications here if desired
+
+    return redirect('myapp:other_profile', username=to_user.username)

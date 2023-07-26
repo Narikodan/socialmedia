@@ -1,0 +1,106 @@
+{% extends 'myapp/navbar.html' %}
+
+{% block content %}
+
+<style>
+  .profile-card {
+      width: 27%; /* Set the desired width for each profile card */
+      
+  }
+
+  .profile-image {
+      height: 60px; /* Set the desired height for the profile picture */
+      width: 80px; /* Set the desired width for the profile picture */
+      object-fit: cover; /* This will preserve the aspect ratio and crop the image */
+      
+  }
+  .card-title{
+    font-size: 15px;
+    
+  }
+  .card{
+    background-color: inherit;
+    border: none;
+    color: rgb(191, 196, 201);
+  }
+  .profile-picture {
+    height: 50px;
+    width: 50px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+h3{
+  color: aliceblue;
+}
+</style>
+
+<div class="container mt-4 text-center">
+  {% if messages %}
+    <div class="row">
+      <div class="col">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <h3>Friends({{ total_friends }})</h3>
+  <div class="row row-cols-1 row-cols-md-3 g-3">
+    {% if user.friends.all %}
+      {% for friend in user.friends.all %}
+      <div class="col profile-card">
+        <a href="{% url 'myapp:other_profile' username=friend.username %}" class="text-decoration-none">
+            <div class="card h-100">
+                {% if friend.profile_picture %}
+                    <img src="{{ friend.profile_picture.image.url }}" class="card-img-top rounded-circle profile-image" alt="Profile Picture">
+                {% else %}
+                    <img src="" class="card-img-top rounded-circle profile-image" alt="Profile Picture">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ friend.first_name }} {{ friend.last_name }}</h5>
+                </div>
+            </div>
+        </a>
+    </div>
+      {% endfor %}
+    {% else %}
+      <div class="col">
+        <p>No friends yet.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <h3>Friendship Requests({{ friend_requests_count }})</h3>
+    <div class="row row-cols-1 row-cols-md-3 g-3">
+        {% if friend_requests %}
+            {% for request in friend_requests %}
+                <div class="col">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <img src="{% if request.from_user.profile_picture %}{{ request.from_user.profile_picture.image.url }}{% endif %}" alt="Profile Picture" class="profile-picture">
+                            <h5 class="card-title">{{ request.from_user.first_name }} {{ request.from_user.last_name }}</h5>
+                            <form class="d-inline-block" action="{% url 'myapp:accept_friend_request' request.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success">Accept</button>
+                            </form>
+                            <form class="d-inline-block" action="{% url 'myapp:reject_friend_request' request.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Reject</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col">
+                <p>No pending friendship requests.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

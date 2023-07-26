@@ -19,8 +19,14 @@ urlpatterns = [
     path('other_profile/<str:username>/', views.other_profile, name='other_profile'),
     path('comments/<int:post_id>/', views.comments, name='comments'),
     path('add_comment/<int:post_id>/', views.add_comment, name='add_comment'),
+    path('friend_requests/', views.view_friend_requests, name='friend_requests'),
     path('chat-rooms/', views.chat_rooms, name='chat_rooms'),
     path('chat-select-user/', views.chat_select_user, name='chat_select_user'),
     path('<str:slug>/', views.chat_room, name='room'),
+    path('send_friend_request/<int:user_id>/', views.send_friend_request, name='send_friend_request'),
+    path('cancel_friend_request/<int:user_id>/', views.cancel_friend_request, name='cancel_friend_request'),
+    path('accept_friend_request/<int:request_id>/', views.accept_friend_request, name='accept_friend_request'),
+    path('reject_friend_request/<int:request_id>/', views.reject_friend_request, name='reject_friend_request'),
+    path('unfriend_user/<int:user_id>/', views.unfriend_user, name='unfriend_user'),
     
 ]

@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import login_required
 from .models import Room, Message
 
@@ -10,7 +10,7 @@ def rooms(request):
 @login_required
 def chat_room(request, slug):
     try:
-        room = Room.objects.get(slug=slug)
+        room = get_object_or_404(Room, slug=slug)
         room_name = room.name
         messages = Message.objects.filter(room=room)
         print(room.slug)
