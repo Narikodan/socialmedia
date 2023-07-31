@@ -46,18 +46,19 @@ def index(request):
         posts = Post.objects.all()
         success_message = messages.get_messages(request)
 
-        # Calculate comment count for each post
-        comment_counts = {post.id: Comment.get_comment_count_for_post(post.id) for post in posts}
+        for post in posts:
+            post.comment_count = Comment.objects.filter(post=post).count()
 
         context = {
             'posts': posts,
             'success_message': success_message,
-            'comment_counts': comment_counts,  # Add comment_counts to the context
         }
 
         return render(request, 'myapp/index.html', context)
 
     return redirect('myapp:login')
+
+
 
 
 @logout_required
@@ -245,15 +246,17 @@ def add_comment(request, post_id):
 @login_required
 def delete_comment(request, comment_id):
     comment = get_object_or_404(Comment, id=comment_id)
+    post_id=comment.post.id
 
     if request.method == 'POST' and comment.user == request.user:
-        # Delete the comment from the database
+        print("Deleting comment:", comment_id)
         comment.delete()
 
         # Redirect back to the post detail page after deleting the comment
-        return redirect('myapp:post_detail', post_id=comment.post.id)
+        return redirect('myapp:comments', post_id)
 
     return JsonResponse({'success': False, 'error': 'Invalid request method or permission'})
+
 
 
 from django.shortcuts import render

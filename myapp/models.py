@@ -22,7 +22,8 @@ class Post(models.Model):
     text = models.TextField(blank=True)
     created_at = models.DateTimeField(default=timezone.now)
     likes = models.ManyToManyField(get_user_model(), through='Like', related_name='liked_posts')
-    comments = models.ManyToManyField('Comment', related_name='post_comments')
+    comments = models.ManyToManyField('Comment', related_name='comments')
+
 
     def __str__(self):
         return f"Post by {self.user.username}"
@@ -40,9 +41,11 @@ class Post(models.Model):
             else:
                 return f"{', '.join(likers_full_names)} liked your post"
         return ""
-
+    
     def get_comment_count(self):
         return self.comments.count()
+
+
 
 class Like(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
@@ -54,7 +57,7 @@ class Like(models.Model):
 
 class Comment(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='post_comments')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comment_set')  # Update the related_name
     text = models.TextField()
     created_at = models.DateTimeField(default=timezone.now)
 

@@ -37,7 +37,10 @@
 
     .comment {
         margin-left: 10%;
-        font-size: 20px;
+        font-size: 15px;
+    }
+    .posttext{
+      font-size: 22px
     }
     
 </style>
@@ -81,7 +84,7 @@
                         </div>
                     </div>
                     <div class="p-2 px-3">
-                        <span>{{ post.text }}</span>
+                        <span class="posttext">{{ post.text }}</span>
                         {% if post.image %}
                             <div class="feed-image">
                                 <img src="{{ post.image.url }}" alt="Post Image">
@@ -108,36 +111,46 @@
     <div class="d-flex justify-content-center row">
       <div class="col-md-8">
         {% for comment in comments reversed %}
-        <div class="d-flex flex-column comment-section mb-3">
-          <div class="bg-white p-2">
-            <div class="d-flex flex-row user-info">
-              <img class="rounded-circle" src="{{ comment.user.profile_picture.image.url }}" width="40">
-              <div class="d-flex flex-column justify-content-start ml-2">
-                <span class="d-block font-weight-bold name">{{ comment.user.get_full_name }}</span>
-                <span class="date text-black-50">{{ comment.created_at|timesince }}</span>
-              </div>
-            </div>
-            <!-- <div class="mt-2">
-              <p class="comment-text">{{ comment.text }}</p>
-            </div> -->
-          </div>
+<div class="d-flex flex-column comment-section mb-3">
+  <div class="bg-white p-2">
+    <div class="d-flex flex-row user-info">
+      <img class="rounded-circle" src="{{ comment.user.profile_picture.image.url }}" width="40">
+      <div class="d-flex flex-column justify-content-start ml-2">
+        <span class="d-block font-weight-bold name">{{ comment.user.get_full_name }}</span>
+        <span class="date text-black-50">{{ comment.created_at|timesince }}</span>
+      </div>
+    </div>
+  </div>
 
-          <div class="bg-white">
-            <div class="d-flex flex-row fs-12 comment">
-                {{ comment.text }}
-            </div>
-          </div>
+  <div class="bg-white">
+    <div class="d-flex flex-row fs-12 comment">
+      {{ comment.text }}
+      
+    </div>
+  </div>
+
+  <div class="bg-white">
+    <div class="d-flex flex-row fs-12">
+      <div class="like p-2 cursor"><i class="fa fa-thumbs-o-up"></i><span class="ml-1">Like</span></div>
+      <div class="like p-2 cursor"><i class="fa fa-commenting-o"></i><span class="ml-1">Comment</span></div>
+      <div class="like p-2 cursor">{% if comment.user == request.user %}
+        <form method="post" action="{% url 'myapp:delete_comment' comment.id %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-link btn-sm text-danger p-0 ml-2" onclick="return confirm('Are you sure you want to delete this comment?')">
+            <i class="fa fa-trash"></i>
+          </button>
+        </form>
+      {% endif %}</i><span class="ml-1"></span></div>
+      
+      {% comment %}
+      <!-- Removed the share icon -->
+      {% endcomment %}
+    </div>
+  </div>
+</div>
+{% endfor %}
 
 
-          <div class="bg-white">
-            <div class="d-flex flex-row fs-12">
-              <div class="like p-2 cursor"><i class="fa fa-thumbs-o-up"></i><span class="ml-1">Like</span></div>
-              <div class="like p-2 cursor"><i class="fa fa-commenting-o"></i><span class="ml-1">Comment</span></div>
-              <div class="like p-2 cursor"><i class="fa fa-share"></i><span class="ml-1">Share</span></div>
-            </div>
-          </div>
-        </div>
-        {% endfor %}
       </div>
     </div>
   </div>
